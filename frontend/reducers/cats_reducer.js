@@ -1,11 +1,7 @@
 import { RECEIVE_CAT, RECEIVE_CATS } from '../actions/cats_actions';
 import _ from 'lodash';
 
-const initialState = {
-  1: { id: 1, name: 'gizmo' },
-  2: { id: 2, name: 'markov' },
-  3: { id: 3, name: 'curie' },
-};
+const initialState = {};
 
 export default function catsReducer(state = initialState, action) {
   // state: { ids of cats => cats }

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CatsControllerTest < ActionDispatch::IntegrationTest
+class CatTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

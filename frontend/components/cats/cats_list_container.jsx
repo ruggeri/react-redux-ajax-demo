@@ -1,8 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import CatsList from './cats_list';
-import { receiveCat } from '../../actions/cats_actions';
+import { createCat, fetchCats } from '../../actions/cats_actions';
 import { allCats } from '../../reducers/selectors';
+
+import * as CatsApi from '../../util/cats_api_util';
 
 // connect(mapStateToProps, mapDispatchToProps)
 // mapStateToProps: hands over the appropriate store data to the
@@ -17,13 +19,18 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  createCat: (cat) => {
-
-    // { type: RECEIVE_CAT, cat: { name: 'BREAKFAST', }};
-    // dispatch => to the store.
-    const action = receiveCat(cat);
-    dispatch(action);
+  createCat: (catParams) => {
+    // createCat(catParams, dispatch);
+    const actionFn = createCat(catParams)
+    dispatch(actionFn)
   },
+
+  fetchCats: () => {
+    console.log('i am fetching cats');
+    // fetchCats(dispatch);
+    const actionFn = fetchCats();
+    dispatch(actionFn);
+  }
 });
 
 const connectorFunction = connect(mapStateToProps, mapDispatchToProps);

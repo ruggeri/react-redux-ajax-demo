@@ -84,8 +84,18 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.RECEIVE_CAT = exports.RECEIVE_CATS = undefined;
 exports.receiveCats = receiveCats;
 exports.receiveCat = receiveCat;
+exports.fetchCats = fetchCats;
+exports.createCat = createCat;
+
+var _cats_api_util = __webpack_require__(/*! ../util/cats_api_util */ "./frontend/util/cats_api_util.js");
+
+var CatsApi = _interopRequireWildcard(_cats_api_util);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 var RECEIVE_CATS = exports.RECEIVE_CATS = 'RECEIVE_CATS';
 var RECEIVE_CAT = exports.RECEIVE_CAT = 'RECEIVE_CAT';
 
@@ -102,6 +112,32 @@ function receiveCat(cat) {
     cat: cat
   };
 }
+
+// higher order function.
+function fetchCats() {
+  return function (dispatch) {
+    CatsApi.fetchCats().then(function (cats) {
+      // window.cats = cats
+      // window.receiveCats = receiveCats
+      // window.dispatch = dispatch
+      var action = receiveCats(cats);
+      // action = { type: RECEIVE_CATS, cats: cats }
+      dispatch(action);
+    });
+  };
+}
+
+function createCat(catParams) {
+  return function (dispatch) {
+    CatsApi.createCat(catParams).then(function (cat) {
+      var action = receiveCat(cat);
+      // action = { type: RECEIVE_CAT, cats: cats }
+      dispatch(action);
+    });
+  };
+}
+
+// // ...
 
 /***/ }),
 
@@ -323,6 +359,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 
 var _react2 = _interopRequireDefault(_react);
@@ -337,22 +375,52 @@ var _cats_list_item2 = _interopRequireDefault(_cats_list_item);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var CatsList = function CatsList(_ref) {
-  var cats = _ref.cats,
-      createCat = _ref.createCat;
-  return _react2.default.createElement(
-    'div',
-    null,
-    _react2.default.createElement(
-      'ul',
-      null,
-      cats.map(function (c) {
-        return _react2.default.createElement(_cats_list_item2.default, { key: c.id, cat: c });
-      })
-    ),
-    _react2.default.createElement(_cats_form2.default, { createCat: createCat })
-  );
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var CatsList = function (_React$Component) {
+  _inherits(CatsList, _React$Component);
+
+  function CatsList(props) {
+    _classCallCheck(this, CatsList);
+
+    return _possibleConstructorReturn(this, (CatsList.__proto__ || Object.getPrototypeOf(CatsList)).call(this, props));
+
+    // in case I wanted to add more.
+  }
+
+  _createClass(CatsList, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.props.fetchCats();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          cats = _props.cats,
+          createCat = _props.createCat;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'ul',
+          null,
+          cats.map(function (c) {
+            return _react2.default.createElement(_cats_list_item2.default, { key: c.id, cat: c });
+          })
+        ),
+        _react2.default.createElement(_cats_form2.default, { createCat: createCat })
+      );
+    }
+  }]);
+
+  return CatsList;
+}(_react2.default.Component);
 
 exports.default = CatsList;
 
@@ -386,6 +454,12 @@ var _cats_actions = __webpack_require__(/*! ../../actions/cats_actions */ "./fro
 
 var _selectors = __webpack_require__(/*! ../../reducers/selectors */ "./frontend/reducers/selectors.js");
 
+var _cats_api_util = __webpack_require__(/*! ../../util/cats_api_util */ "./frontend/util/cats_api_util.js");
+
+var CatsApi = _interopRequireWildcard(_cats_api_util);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // connect(mapStateToProps, mapDispatchToProps)
@@ -404,12 +478,17 @@ var mapStateToProps = function mapStateToProps(state) {
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
-    createCat: function createCat(cat) {
+    createCat: function createCat(catParams) {
+      // createCat(catParams, dispatch);
+      var actionFn = (0, _cats_actions.createCat)(catParams);
+      dispatch(actionFn);
+    },
 
-      // { type: RECEIVE_CAT, cat: { name: 'BREAKFAST', }};
-      // dispatch => to the store.
-      var action = (0, _cats_actions.receiveCat)(cat);
-      dispatch(action);
+    fetchCats: function fetchCats() {
+      console.log('i am fetching cats');
+      // fetchCats(dispatch);
+      var actionFn = (0, _cats_actions.fetchCats)();
+      dispatch(actionFn);
     }
   };
 };
@@ -520,11 +599,7 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var initialState = {
-  1: { id: 1, name: 'gizmo' },
-  2: { id: 2, name: 'markov' },
-  3: { id: 3, name: 'curie' }
-};
+var initialState = {};
 
 function catsReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -653,13 +728,59 @@ var _root_reducer2 = _interopRequireDefault(_root_reducer);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var thunkMiddleware = function thunkMiddleware(_ref) {
+  var dispatch = _ref.dispatch,
+      getState = _ref.getState;
+  return function (next) {
+    return function (action) {
+      if (typeof action === 'function') {
+        return action(dispatch);
+      }
+      return next(action);
+    };
+  };
+};
+
 function configureStore() {
-  var store = (0, _redux.createStore)(_root_reducer2.default);
+  var store = (0, _redux.createStore)(_root_reducer2.default, { cats: {} }, (0, _redux.applyMiddleware)(thunkMiddleware));
 
   window.store = store;
 
   return store;
 }
+
+/***/ }),
+
+/***/ "./frontend/util/cats_api_util.js":
+/*!****************************************!*\
+  !*** ./frontend/util/cats_api_util.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var fetchCats = exports.fetchCats = function fetchCats() {
+  // return the promise.
+  return $.ajax({
+    url: '/api/cats',
+    method: 'GET',
+    dataType: 'json'
+  });
+};
+
+var createCat = exports.createCat = function createCat(catParams) {
+  return $.ajax({
+    url: '/api/cats',
+    method: 'POST',
+    data: { cat: catParams },
+    dataType: 'json'
+  });
+};
 
 /***/ }),
 
