@@ -1,0 +1,12 @@
+import { createStore } from 'redux';
+import rootReducer from '../reducers/root_reducer';
+
+export default function configureStore() {
+  const store = createStore(
+    rootReducer,
+  );
+
+  window.store = store;
+
+  return store;
+}
